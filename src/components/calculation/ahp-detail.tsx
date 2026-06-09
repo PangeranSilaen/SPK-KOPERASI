@@ -21,15 +21,20 @@ export function AhpDetail({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap gap-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Metric label="λ maks" value={formatDecimal(ahp.lambdaMax)} />
         <Metric label="CI" value={formatDecimal(ahp.ci)} />
         <Metric label="CR" value={formatDecimal(ahp.cr)} />
-        <div className="flex items-center">
+        <div className="flex flex-col justify-center rounded-md border border-border px-3 py-2">
+          <div className="text-xs text-muted-foreground">Status</div>
           {ahp.isConsistent ? (
-            <Badge className="bg-[var(--color-trading-up)] text-black">Konsisten</Badge>
+            <Badge className="mt-0.5 w-fit border-transparent bg-success-soft text-success">
+              Konsisten
+            </Badge>
           ) : (
-            <Badge className="bg-[var(--color-trading-down)] text-white">Tidak konsisten</Badge>
+            <Badge className="mt-0.5 w-fit border-transparent bg-warning-soft text-warning">
+              Tidak konsisten
+            </Badge>
           )}
         </div>
       </div>

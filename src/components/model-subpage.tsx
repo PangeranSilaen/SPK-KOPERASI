@@ -43,7 +43,7 @@ export function SubPageHeader({
 export function ReadOnlyNotice({ status }: { status: ModelStatus }) {
   const label = status === "ACTIVE" ? "Aktif" : "Arsip";
   return (
-    <Card className="border-primary/40 bg-primary/5">
+    <Card className="border-primary/30 bg-accent">
       <CardContent className="py-4 text-sm">
         Model ini berstatus <strong>{label}</strong> dan bersifat hanya-baca. Duplikat model
         menjadi Draf untuk melakukan perubahan.

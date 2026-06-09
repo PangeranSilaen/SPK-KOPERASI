@@ -17,9 +17,6 @@ export default function LoginPage() {
     <main className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="space-y-2 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-xl">
-            SPK
-          </div>
           <CardTitle className="text-xl">SPK Koperasi</CardTitle>
           <CardDescription>
             Masuk untuk mengelola Model SPK dan perhitungan AHP-WP.

@@ -21,6 +21,7 @@ export async function GET(request: Request) {
   const modelId = searchParams.get("modelId");
   const conditionId = searchParams.get("conditionId");
   const expertIdsRaw = searchParams.get("expertIds");
+  const customerName = searchParams.get("customerName")?.trim() || undefined;
 
   if (!modelId || !conditionId || !expertIdsRaw) {
     return NextResponse.json({ error: "Parameter tidak lengkap." }, { status: 400 });
@@ -33,6 +34,7 @@ export async function GET(request: Request) {
     const element = createElement(ResultPdf, {
       result,
       exportedAt: formatDateId(new Date()),
+      customerName,
     }) as ReactElement<DocumentProps>;
     const buffer = await renderToBuffer(element);
 

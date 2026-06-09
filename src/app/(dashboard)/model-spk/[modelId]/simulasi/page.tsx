@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getModelCompleteness } from "@/server/services/completeness-service";
@@ -45,13 +44,6 @@ export default async function SimulasiPage({
       />
 
       <SimulationPanel modelId={modelId} conditions={conditions} experts={experts} />
-
-      <Link
-        href={`/model-spk/${modelId}`}
-        className="text-sm text-muted-foreground hover:text-foreground"
-      >
-        ← Kembali ke detail model
-      </Link>
     </div>
   );
 }

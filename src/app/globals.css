@@ -48,80 +48,98 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* Tema terang (default) — dashboard pro modern, slate netral + aksen indigo */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --background: #f8fafc; /* slate 50 */
+  --foreground: #0f172a; /* slate 900 / ink */
+  --card: #ffffff; /* surface */
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #4f46e5; /* indigo 600 */
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9; /* slate 100 / surface-muted */
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b; /* slate 500 */
+  --accent: #eef2ff; /* indigo 50 / accent-soft */
+  --accent-foreground: #4338ca; /* indigo 700 */
+  --destructive: #dc2626; /* red 600 */
+  --border: #e2e8f0; /* slate 200 */
+  --input: #e2e8f0;
+  --ring: #4f46e5;
+  --chart-1: #4f46e5;
+  --chart-2: #16a34a;
+  --chart-3: #d97706;
+  --chart-4: #0891b2;
+  --chart-5: #db2777;
+  --radius: 0.5rem; /* md ~8px */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: #4f46e5;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eef2ff;
+  --sidebar-accent-foreground: #4338ca;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #4f46e5;
+
+  --success: #16a34a;
+  --success-soft: #dcfce7;
+  --danger: #dc2626;
+  --danger-soft: #fee2e2;
+  --warning: #d97706;
+  --warning-soft: #fef3c7;
 }
 
-/* Tema gelap gaya Binance (DESIGN.md) — tema default aplikasi */
+/* Tema gelap setara-kontras (DESIGN.md: dashboard pro modern, aksen indigo) */
 .dark {
-  --background: #0b0e11; /* canvas-dark */
-  --foreground: #eaecef; /* body */
-  --card: #1e2329; /* surface-card-dark */
-  --card-foreground: #eaecef;
-  --popover: #1e2329;
-  --popover-foreground: #eaecef;
-  --primary: #fcd535; /* Binance yellow */
-  --primary-foreground: #181a20; /* on-primary (hitam) */
-  --secondary: #2b3139; /* surface-elevated-dark */
-  --secondary-foreground: #eaecef;
-  --muted: #2b3139;
-  --muted-foreground: #929aa5; /* muted-strong */
-  --accent: #2b3139;
-  --accent-foreground: #fcd535;
-  --destructive: #f6465d; /* trading-down */
-  --border: #2b3139; /* hairline-on-dark */
-  --input: #2b3139;
-  --ring: #fcd535;
-  --chart-1: #fcd535;
-  --chart-2: #0ecb81;
-  --chart-3: #f6465d;
-  --chart-4: #2dbdb6;
-  --chart-5: #3b82f6;
-  --sidebar: #0b0e11;
-  --sidebar-foreground: #eaecef;
-  --sidebar-primary: #fcd535;
-  --sidebar-primary-foreground: #181a20;
-  --sidebar-accent: #1e2329;
-  --sidebar-accent-foreground: #fcd535;
-  --sidebar-border: #2b3139;
-  --sidebar-ring: #fcd535;
+  --background: #0b0f1a; /* bg-dark */
+  --foreground: #f1f5f9; /* ink-dark */
+  --card: #111725; /* surface-dark */
+  --card-foreground: #f1f5f9;
+  --popover: #111725;
+  --popover-foreground: #f1f5f9;
+  --primary: #6366f1; /* indigo 500 (sedikit lebih terang untuk dark) */
+  --primary-foreground: #ffffff;
+  --secondary: #1a2234; /* surface-muted-dark */
+  --secondary-foreground: #f1f5f9;
+  --muted: #1a2234;
+  --muted-foreground: #94a3b8; /* ink-muted-dark */
+  --accent: #1e1b4b; /* accent-soft-dark */
+  --accent-foreground: #c7d2fe;
+  --destructive: #ef4444;
+  --border: #22293b; /* border-dark */
+  --input: #22293b;
+  --ring: #6366f1;
+  --chart-1: #6366f1;
+  --chart-2: #22c55e;
+  --chart-3: #f59e0b;
+  --chart-4: #06b6d4;
+  --chart-5: #ec4899;
+  --sidebar: #0d1322;
+  --sidebar-foreground: #f1f5f9;
+  --sidebar-primary: #6366f1;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1a2234;
+  --sidebar-accent-foreground: #c7d2fe;
+  --sidebar-border: #22293b;
+  --sidebar-ring: #6366f1;
+
+  --success: #22c55e;
+  --success-soft: #14321f;
+  --danger: #ef4444;
+  --danger-soft: #3a1a1a;
+  --warning: #f59e0b;
+  --warning-soft: #3a2c12;
 }
 
-/* Warna semantik trading untuk indikator naik/turun */
 @theme inline {
-  --color-trading-up: #0ecb81;
-  --color-trading-down: #f6465d;
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
 }
 
 @layer base {

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { saveStrategySchema } from "@/lib/validations/strategy";
 import { assertEditable, ModelError } from "@/server/services/model-service";
+import { logAudit } from "@/server/services/audit-service";
 
 export type SaveStrategyResult = { ok: boolean; error?: string };
 
@@ -21,7 +22,7 @@ export async function saveStrategyScoresAction(input: {
   conditionId: string;
   scores: ScorePayload[];
 }): Promise<SaveStrategyResult> {
-  await requireSession();
+  const user = await requireSession();
 
   const parsed = saveStrategySchema.safeParse(input);
   if (!parsed.success) {
@@ -65,6 +66,19 @@ export async function saveStrategyScoresAction(input: {
       }),
     ),
   );
+
+  const expert = await prisma.expert.findUnique({
+    where: { id: expertId },
+    select: { name: true },
+  });
+  await logAudit({
+    modelId,
+    action: "UPSERT",
+    entity: "Nilai Strategi",
+    summary: `Menyimpan nilai strategi untuk expert "${expert?.name ?? expertId}".`,
+    userId: user.id,
+    userName: user.name,
+  });
 
   revalidatePath(`/model-spk/${modelId}/nilai-strategi`);
   revalidatePath(`/model-spk/${modelId}`);

@@ -11,8 +11,23 @@ import {
   criterionSchema,
 } from "@/lib/validations/entity";
 import { assertEditable, ModelError } from "@/server/services/model-service";
+import { logAudit } from "@/server/services/audit-service";
 
 export type ActionResult = { ok: boolean; error?: string };
+
+async function audit(
+  modelId: string,
+  action: string,
+  entity: string,
+  summary: string,
+) {
+  try {
+    const user = await requireSession();
+    await logAudit({ modelId, action, entity, summary, userId: user.id, userName: user.name });
+  } catch {
+    // abaikan kegagalan audit
+  }
+}
 
 async function ensureEditable(modelId: string): Promise<ActionResult | null> {
   const model = await prisma.decisionModel.findUnique({
@@ -82,6 +97,12 @@ export async function upsertExpertAction(
     throw e;
   }
 
+  await audit(
+    modelId,
+    "UPSERT",
+    "Expert",
+    `${id ? "Mengubah" : "Menambah"} expert "${data.name}".`,
+  );
   revalidateModel(modelId, "expert");
   return { ok: true };
 }
@@ -92,7 +113,9 @@ export async function deleteExpertAction(formData: FormData): Promise<void> {
   const id = String(formData.get("id") ?? "");
   const guard = await ensureEditable(modelId);
   if (guard) return;
+  const item = await prisma.expert.findUnique({ where: { id }, select: { name: true } });
   await prisma.expert.delete({ where: { id } });
+  await audit(modelId, "DELETE", "Expert", `Menghapus expert "${item?.name ?? id}".`);
   revalidateModel(modelId, "expert");
 }
 
@@ -131,6 +154,12 @@ export async function upsertCriterionAction(
     throw e;
   }
 
+  await audit(
+    modelId,
+    "UPSERT",
+    "Kriteria",
+    `${id ? "Mengubah" : "Menambah"} kriteria ${parsed.data.code} - ${parsed.data.name}.`,
+  );
   revalidateModel(modelId, "kriteria");
   return { ok: true };
 }
@@ -141,7 +170,17 @@ export async function deleteCriterionAction(formData: FormData): Promise<void> {
   const id = String(formData.get("id") ?? "");
   const guard = await ensureEditable(modelId);
   if (guard) return;
+  const item = await prisma.criterion.findUnique({
+    where: { id },
+    select: { code: true, name: true },
+  });
   await prisma.criterion.delete({ where: { id } });
+  await audit(
+    modelId,
+    "DELETE",
+    "Kriteria",
+    `Menghapus kriteria ${item ? `${item.code} - ${item.name}` : id}.`,
+  );
   revalidateModel(modelId, "kriteria");
 }
 
@@ -188,6 +227,12 @@ export async function upsertAlternativeAction(
     throw e;
   }
 
+  await audit(
+    modelId,
+    "UPSERT",
+    "Alternatif",
+    `${id ? "Mengubah" : "Menambah"} alternatif ${data.code} - ${data.name}.`,
+  );
   revalidateModel(modelId, "alternatif");
   return { ok: true };
 }
@@ -198,7 +243,17 @@ export async function deleteAlternativeAction(formData: FormData): Promise<void>
   const id = String(formData.get("id") ?? "");
   const guard = await ensureEditable(modelId);
   if (guard) return;
+  const item = await prisma.alternative.findUnique({
+    where: { id },
+    select: { code: true, name: true },
+  });
   await prisma.alternative.delete({ where: { id } });
+  await audit(
+    modelId,
+    "DELETE",
+    "Alternatif",
+    `Menghapus alternatif ${item ? `${item.code} - ${item.name}` : id}.`,
+  );
   revalidateModel(modelId, "alternatif");
 }
 
@@ -245,6 +300,12 @@ export async function upsertConditionAction(
     throw e;
   }
 
+  await audit(
+    modelId,
+    "UPSERT",
+    "Kondisi",
+    `${id ? "Mengubah" : "Menambah"} kondisi ${data.code} - ${data.name}.`,
+  );
   revalidateModel(modelId, "kondisi");
   return { ok: true };
 }
@@ -255,6 +316,16 @@ export async function deleteConditionAction(formData: FormData): Promise<void> {
   const id = String(formData.get("id") ?? "");
   const guard = await ensureEditable(modelId);
   if (guard) return;
+  const item = await prisma.condition.findUnique({
+    where: { id },
+    select: { code: true, name: true },
+  });
   await prisma.condition.delete({ where: { id } });
+  await audit(
+    modelId,
+    "DELETE",
+    "Kondisi",
+    `Menghapus kondisi ${item ? `${item.code} - ${item.name}` : id}.`,
+  );
   revalidateModel(modelId, "kondisi");
 }

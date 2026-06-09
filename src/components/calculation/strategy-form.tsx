@@ -14,6 +14,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { saveStrategyScoresAction } from "@/server/actions/strategy";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Entity = { id: string; code: string; name: string };
 type Expert = { id: string; name: string; isEnabled: boolean };
@@ -139,34 +147,36 @@ export function StrategyForm({
       <CardHeader className="space-y-4">
         <CardTitle className="text-base">Input Nilai Strategi (skala 1-5)</CardTitle>
         <div className="grid gap-3 sm:grid-cols-2">
-          <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Expert</label>
-            <select
-              value={expertId}
-              onChange={(e) => setExpertId(e.target.value)}
-              className="flex h-9 w-full rounded-lg border border-input bg-transparent px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
-              {experts.map((e) => (
-                <option key={e.id} value={e.id}>
-                  {e.name}
-                  {e.isEnabled ? "" : " (nonaktif)"}
-                </option>
-              ))}
-            </select>
+          <div className="space-y-1.5">
+            <Label htmlFor="strat-expert">Expert</Label>
+            <Select value={expertId} onValueChange={(v) => setExpertId(v ?? "")}>
+              <SelectTrigger id="strat-expert" className="w-full">
+                <SelectValue placeholder="Pilih expert" />
+              </SelectTrigger>
+              <SelectContent>
+                {experts.map((e) => (
+                  <SelectItem key={e.id} value={e.id}>
+                    {e.name}
+                    {e.isEnabled ? "" : " (nonaktif)"}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Kondisi Nasabah</label>
-            <select
-              value={conditionId}
-              onChange={(e) => setConditionId(e.target.value)}
-              className="flex h-9 w-full rounded-lg border border-input bg-transparent px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
-              {conditions.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.code} - {c.name}
-                </option>
-              ))}
-            </select>
+          <div className="space-y-1.5">
+            <Label htmlFor="strat-condition">Kondisi Nasabah</Label>
+            <Select value={conditionId} onValueChange={(v) => setConditionId(v ?? "")}>
+              <SelectTrigger id="strat-condition" className="w-full">
+                <SelectValue placeholder="Pilih kondisi" />
+              </SelectTrigger>
+              <SelectContent>
+                {conditions.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.code} - {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <div className="space-y-2">
@@ -202,25 +212,27 @@ export function StrategyForm({
                     const v = values.get(key(a.id, c.id));
                     return (
                       <TableCell key={c.id} className="text-center">
-                        <select
-                          value={v ?? ""}
+                        <Select
+                          value={v ? String(v) : ""}
                           disabled={!editable}
-                          onChange={(e) =>
-                            setValue(a.id, c.id, Number(e.target.value))
-                          }
-                          className={`h-8 w-16 rounded-md border bg-transparent px-1 text-center text-sm outline-none disabled:opacity-50 ${
-                            v === undefined
-                              ? "border-[var(--color-trading-down)]/50"
-                              : "border-input"
-                          }`}
+                          onValueChange={(val) => setValue(a.id, c.id, Number(val))}
                         >
-                          <option value="">-</option>
-                          {[1, 2, 3, 4, 5].map((n) => (
-                            <option key={n} value={n}>
-                              {n}
-                            </option>
-                          ))}
-                        </select>
+                          <SelectTrigger
+                            size="sm"
+                            className={`mx-auto w-16 justify-center ${
+                              v === undefined ? "border-warning/60" : ""
+                            }`}
+                          >
+                            <SelectValue placeholder="-" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {[1, 2, 3, 4, 5].map((n) => (
+                              <SelectItem key={n} value={String(n)}>
+                                {n}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </TableCell>
                     );
                   })}

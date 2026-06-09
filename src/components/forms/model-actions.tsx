@@ -1,17 +1,14 @@
 "use client";
 
-import { useActionState, useState } from "react";
-import { Send, Copy, Archive } from "lucide-react";
+import { Send, Copy, Archive, RotateCcw } from "lucide-react";
 import {
   publishModelAction,
   duplicateModelAction,
   archiveModelAction,
-  type ActionResult,
+  restoreModelAction,
 } from "@/server/actions/model";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-
-const initial: ActionResult = { ok: false };
+import { ConfirmDialog } from "@/components/forms/confirm-dialog";
 
 export function ModelActions({
   modelId,
@@ -20,67 +17,72 @@ export function ModelActions({
   modelId: string;
   status: "DRAFT" | "ACTIVE" | "ARCHIVED";
 }) {
-  const [state, publishAction, publishing] = useActionState(publishModelAction, initial);
-  const [confirmArchive, setConfirmArchive] = useState(false);
-
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap gap-2">
-        {status === "DRAFT" ? (
-          <form action={publishAction}>
-            <input type="hidden" name="modelId" value={modelId} />
-            <Button type="submit" disabled={publishing}>
+    <div className="flex flex-wrap gap-2">
+      {status === "DRAFT" ? (
+        <ConfirmDialog
+          modelId={modelId}
+          trigger={
+            <Button>
               <Send className="h-4 w-4" />
-              {publishing ? "Memvalidasi..." : "Publish menjadi Aktif"}
+              Publish menjadi Aktif
             </Button>
-          </form>
-        ) : null}
+          }
+          title="Publish model menjadi Aktif?"
+          description="Model akan divalidasi lalu dijadikan model Aktif. Model Aktif sebelumnya otomatis menjadi Arsip. Model Aktif tidak dapat diedit langsung."
+          confirmLabel="Publish"
+          successMessage="Model berhasil dipublish menjadi Aktif."
+          action={(fd) => publishModelAction({ ok: false }, fd)}
+        />
+      ) : null}
 
-        <form action={duplicateModelAction}>
-          <input type="hidden" name="modelId" value={modelId} />
-          <Button type="submit" variant="outline">
+      <ConfirmDialog
+        modelId={modelId}
+        trigger={
+          <Button variant="outline">
             <Copy className="h-4 w-4" />
             {status === "ACTIVE" ? "Duplikat menjadi Draf" : "Duplikat"}
           </Button>
-        </form>
+        }
+        title="Duplikat model ini?"
+        description="Salinan baru berstatus Draf akan dibuat berikut seluruh entitas dan penilaiannya. Anda akan diarahkan ke salinan tersebut."
+        confirmLabel="Duplikat"
+        action={duplicateModelAction}
+      />
 
-        {status !== "ARCHIVED" && status !== "ACTIVE" ? (
-          confirmArchive ? (
-            <form action={archiveModelAction}>
-              <input type="hidden" name="modelId" value={modelId} />
-              <Button type="submit" variant="destructive">
-                <Archive className="h-4 w-4" />
-                Konfirmasi Arsipkan
-              </Button>
-            </form>
-          ) : (
-            <Button variant="outline" onClick={() => setConfirmArchive(true)}>
+      {status === "DRAFT" ? (
+        <ConfirmDialog
+          modelId={modelId}
+          trigger={
+            <Button variant="outline">
               <Archive className="h-4 w-4" />
               Arsipkan
             </Button>
-          )
-        ) : null}
-      </div>
-
-      {state.error ? (
-        <Alert variant="destructive">
-          <AlertTitle>{state.error}</AlertTitle>
-          {state.problems && state.problems.length > 0 ? (
-            <AlertDescription>
-              <ul className="ml-4 list-disc space-y-1">
-                {state.problems.map((p, i) => (
-                  <li key={i}>{p}</li>
-                ))}
-              </ul>
-            </AlertDescription>
-          ) : null}
-        </Alert>
+          }
+          title="Arsipkan model ini?"
+          description="Model akan dipindahkan ke Arsip dan menjadi hanya-baca. Anda dapat mengembalikannya menjadi Draf kapan saja."
+          confirmLabel="Arsipkan"
+          variant="destructive"
+          successMessage="Model berhasil diarsipkan."
+          action={archiveModelAction}
+        />
       ) : null}
 
-      {state.ok ? (
-        <Alert>
-          <AlertTitle>Model berhasil dipublish menjadi Aktif.</AlertTitle>
-        </Alert>
+      {status === "ARCHIVED" ? (
+        <ConfirmDialog
+          modelId={modelId}
+          trigger={
+            <Button variant="outline">
+              <RotateCcw className="h-4 w-4" />
+              Kembalikan dari Arsip
+            </Button>
+          }
+          title="Kembalikan model dari Arsip?"
+          description="Model akan dikembalikan menjadi Draf sehingga dapat diedit kembali."
+          confirmLabel="Kembalikan"
+          successMessage="Model dikembalikan menjadi Draf."
+          action={restoreModelAction}
+        />
       ) : null}
     </div>
   );

@@ -249,3 +249,33 @@ export async function archiveModel(modelId: string): Promise<void> {
     data: { status: "ARCHIVED", isDefault: false },
   });
 }
+
+/**
+ * Kembalikan model dari Arsip menjadi Draf agar dapat diedit kembali.
+ */
+export async function restoreModel(modelId: string): Promise<void> {
+  const model = await prisma.decisionModel.findUnique({ where: { id: modelId } });
+  if (!model) throw new ModelError("Model tidak ditemukan.");
+  if (model.status !== "ARCHIVED") {
+    throw new ModelError("Hanya model berstatus Arsip yang dapat dikembalikan.");
+  }
+  await prisma.decisionModel.update({
+    where: { id: modelId },
+    data: { status: "DRAFT", isDefault: false },
+  });
+}
+
+/**
+ * Hapus model beserta seluruh entitas terkait (cascade).
+ * Model AKTIF tidak boleh dihapus langsung — harus diarsipkan dulu.
+ */
+export async function deleteModel(modelId: string): Promise<void> {
+  const model = await prisma.decisionModel.findUnique({ where: { id: modelId } });
+  if (!model) throw new ModelError("Model tidak ditemukan.");
+  if (model.status === "ACTIVE") {
+    throw new ModelError(
+      "Model aktif tidak dapat dihapus. Arsipkan model terlebih dahulu.",
+    );
+  }
+  await prisma.decisionModel.delete({ where: { id: modelId } });
+}

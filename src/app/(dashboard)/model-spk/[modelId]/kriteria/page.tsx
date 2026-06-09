@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -90,9 +89,9 @@ export default async function KriteriaPage({
                     <TableCell>{c.name}</TableCell>
                     <TableCell>
                       {c.type === "BENEFIT" ? (
-                        <Badge className="bg-[var(--color-trading-up)] text-black">Benefit</Badge>
+                        <Badge className="border-transparent bg-success-soft text-success">Benefit</Badge>
                       ) : (
-                        <Badge className="bg-[var(--color-trading-down)] text-white">Cost</Badge>
+                        <Badge className="border-transparent bg-danger-soft text-danger">Cost</Badge>
                       )}
                     </TableCell>
                     <TableCell className="text-center font-mono">{c.order}</TableCell>
@@ -133,13 +132,6 @@ export default async function KriteriaPage({
           )}
         </CardContent>
       </Card>
-
-      <Link
-        href={`/model-spk/${modelId}`}
-        className="text-sm text-muted-foreground hover:text-foreground"
-      >
-        ← Kembali ke detail model
-      </Link>
     </div>
   );
 }

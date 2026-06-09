@@ -14,6 +14,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { saveAhpComparisonsAction } from "@/server/actions/ahp";
 import {
   aggregatePairwiseByGeometricMean,
@@ -206,19 +213,20 @@ export function AhpForm({
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base">Perbandingan Berpasangan</CardTitle>
-            <div className="w-48">
-              <select
-                value={expertId}
-                onChange={(e) => setExpertId(e.target.value)}
-                className="flex h-9 w-full rounded-lg border border-input bg-transparent px-3 py-1 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-              >
-                {experts.map((e) => (
-                  <option key={e.id} value={e.id}>
-                    {e.name}
-                    {e.isEnabled ? "" : " (nonaktif)"}
-                  </option>
-                ))}
-              </select>
+            <div className="w-56">
+              <Select value={expertId} onValueChange={(v) => setExpertId(v ?? "")}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Pilih expert" />
+                </SelectTrigger>
+                <SelectContent>
+                  {experts.map((e) => (
+                    <SelectItem key={e.id} value={e.id}>
+                      {e.name}
+                      {e.isEnabled ? "" : " (nonaktif)"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -237,15 +245,17 @@ export function AhpForm({
                 const pair = pairs[idx];
                 return (
                   <div key={`${p.leftId}_${p.rightId}`} className="rounded-lg border border-border p-3">
-                    <div className="mb-3 flex items-center justify-between text-sm">
-                      <span className="font-medium">
+                    <div className="mb-3 grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-sm">
+                      <span className="text-right font-medium">
                         <span className="font-mono text-primary">{pair.left.code}</span>{" "}
                         {pair.left.name}
                       </span>
-                      <span className="text-muted-foreground">vs</span>
-                      <span className="text-right font-medium">
-                        {pair.right.name}{" "}
-                        <span className="font-mono text-primary">{pair.right.code}</span>
+                      <span className="rounded bg-muted px-1.5 py-0.5 text-xs font-medium text-muted-foreground">
+                        vs
+                      </span>
+                      <span className="text-left font-medium">
+                        <span className="font-mono text-primary">{pair.right.code}</span>{" "}
+                        {pair.right.name}
                       </span>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
@@ -269,7 +279,7 @@ export function AhpForm({
                             }
                             className={`rounded-md border px-2.5 py-1 text-xs transition-colors ${
                               p.preference === opt.v
-                                ? "border-primary bg-primary/15 text-foreground"
+                                ? "border-primary bg-accent text-accent-foreground"
                                 : "border-border text-muted-foreground hover:bg-muted"
                             }`}
                           >
@@ -277,18 +287,24 @@ export function AhpForm({
                           </button>
                         ))}
                       </div>
-                      <select
-                        value={p.scale}
-                        disabled={!editable || p.preference === "EQUAL"}
-                        onChange={(e) => updatePair(idx, { scale: Number(e.target.value) })}
-                        className="ml-auto flex h-8 rounded-md border border-input bg-transparent px-2 text-xs outline-none disabled:opacity-50"
-                      >
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
-                          <option key={n} value={n}>
-                            Intensitas {n}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="ml-auto w-36">
+                        <Select
+                          value={String(p.scale)}
+                          onValueChange={(v) => updatePair(idx, { scale: Number(v) })}
+                          disabled={!editable || p.preference === "EQUAL"}
+                        >
+                          <SelectTrigger size="sm" className="w-full">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
+                              <SelectItem key={n} value={String(n)}>
+                                Intensitas {n}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                   </div>
                 );
@@ -354,11 +370,11 @@ export function AhpForm({
 
 function ConsistencyBadge({ cr, isConsistent }: { cr: number; isConsistent: boolean }) {
   return isConsistent ? (
-    <Badge className="bg-[var(--color-trading-up)] text-black">
+    <Badge className="border-transparent bg-success-soft text-success">
       Konsisten (CR = {formatDecimal(cr)})
     </Badge>
   ) : (
-    <Badge className="bg-[var(--color-trading-down)] text-white">
+    <Badge className="border-transparent bg-warning-soft text-warning">
       Tidak konsisten (CR = {formatDecimal(cr)} &gt; 0.1)
     </Badge>
   );

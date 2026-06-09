@@ -17,6 +17,8 @@ import {
   Table2,
   Calculator,
   ChevronRight,
+  History,
+  ScrollText,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -29,6 +31,8 @@ const SUBPAGES = [
   { slug: "ahp", label: "Input AHP", icon: GitCompare, desc: "Perbandingan berpasangan" },
   { slug: "nilai-strategi", label: "Nilai Strategi", icon: Table2, desc: "Input nilai WP 1-5" },
   { slug: "simulasi", label: "Simulasi & Hasil", icon: Calculator, desc: "Hitung rekomendasi" },
+  { slug: "riwayat", label: "Riwayat Kalkulasi", icon: History, desc: "Rekomendasi per nasabah" },
+  { slug: "audit", label: "Log Aktivitas", icon: ScrollText, desc: "Jejak perubahan model" },
 ];
 
 export default async function ModelDetailPage({
@@ -76,7 +80,7 @@ export default async function ModelDetailPage({
       <ModelActions modelId={model.id} status={model.status} />
 
       {model.status === "ACTIVE" ? (
-        <Card className="border-primary/40 bg-primary/5">
+        <Card className="border-primary/30 bg-accent">
           <CardContent className="py-4 text-sm">
             Model ini berstatus <strong>Aktif</strong> dan tidak dapat diedit langsung.
             Gunakan tombol <strong>Duplikat menjadi Draf</strong> untuk melakukan perubahan.
@@ -144,9 +148,9 @@ export default async function ModelDetailPage({
                       {!e.isEnabled ? " (nonaktif)" : ""}
                     </span>
                     {e.complete ? (
-                      <Badge className="bg-[var(--color-trading-up)] text-black">Lengkap</Badge>
+                      <Badge className="border-transparent bg-success-soft text-success">Lengkap</Badge>
                     ) : (
-                      <Badge variant="outline" className="text-muted-foreground">
+                      <Badge variant="outline" className="text-warning">
                         Belum lengkap
                       </Badge>
                     )}

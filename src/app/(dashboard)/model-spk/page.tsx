@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/table";
 import { ModelStatusBadge } from "@/components/model-status-badge";
 import { CreateModelDialog } from "@/components/forms/create-model-dialog";
+import { ModelRowDelete } from "@/components/forms/model-row-delete";
 import { formatDateId } from "@/lib/format-date";
 
 export const dynamic = "force-dynamic";
@@ -96,12 +97,19 @@ export default async function ModelSpkListPage() {
                       {formatDateId(m.updatedAt)}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Link
-                        href={`/model-spk/${m.id}`}
-                        className={buttonVariants({ variant: "outline", size: "sm" })}
-                      >
-                        Lihat
-                      </Link>
+                      <div className="flex items-center justify-end gap-2">
+                        <Link
+                          href={`/model-spk/${m.id}`}
+                          className={buttonVariants({ variant: "outline", size: "sm" })}
+                        >
+                          Lihat
+                        </Link>
+                        <ModelRowDelete
+                          modelId={m.id}
+                          modelName={m.name}
+                          status={m.status}
+                        />
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
