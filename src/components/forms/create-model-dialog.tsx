@@ -1,8 +1,8 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useState, useTransition } from "react";
 import { Plus } from "lucide-react";
-import { createModelAction, type ActionResult } from "@/server/actions/model";
+import { createModelAction } from "@/server/actions/model";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,16 +17,20 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-const initial: ActionResult = { ok: false };
-
 export function CreateModelDialog() {
   const [open, setOpen] = useState(false);
-  const [state, formAction, pending] = useActionState(createModelAction, initial);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
 
-  // Tutup dialog jika berhasil (redirect terjadi, tapi jaga-jaga).
-  useEffect(() => {
-    if (state.ok) setOpen(false);
-  }, [state.ok]);
+  function handleSubmit(formData: FormData) {
+    startTransition(async () => {
+      // createModelAction melakukan redirect saat sukses; error dikembalikan sebagai state.
+      const res = await createModelAction({ ok: false }, formData);
+      if (res && !res.ok) {
+        setError(res.error ?? "Gagal membuat model.");
+      }
+    });
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -45,10 +49,10 @@ export function CreateModelDialog() {
             Model baru akan dibuat dengan status Draf dan dapat diedit.
           </DialogDescription>
         </DialogHeader>
-        <form action={formAction} className="space-y-4">
-          {state.error ? (
+        <form action={handleSubmit} className="space-y-4">
+          {error ? (
             <Alert variant="destructive">
-              <AlertDescription>{state.error}</AlertDescription>
+              <AlertDescription>{error}</AlertDescription>
             </Alert>
           ) : null}
           <div className="space-y-2">

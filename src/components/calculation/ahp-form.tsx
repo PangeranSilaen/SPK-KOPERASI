@@ -103,7 +103,10 @@ export function AhpForm({
     return set;
   }, [existing]);
 
-  const currentPairs = stateByExpert.get(expertId) ?? [];
+  const currentPairs = useMemo(
+    () => stateByExpert.get(expertId) ?? [],
+    [stateByExpert, expertId],
+  );
 
   const savedCount = pairs.filter((p) =>
     savedKeys.has(`${expertId}__${p.left.id}__${p.right.id}`),

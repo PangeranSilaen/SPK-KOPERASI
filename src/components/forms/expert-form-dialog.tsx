@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { Plus, Pencil } from "lucide-react";
-import { upsertExpertAction, type ActionResult } from "@/server/actions/entities";
+import { upsertExpertAction } from "@/server/actions/entities";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,8 +18,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-const initial: ActionResult = { ok: false };
 
 export type ExpertData = {
   id: string;
@@ -37,12 +36,22 @@ export function ExpertFormDialog({
   expert?: ExpertData;
 }) {
   const [open, setOpen] = useState(false);
-  const [state, formAction, pending] = useActionState(upsertExpertAction, initial);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
   const isEdit = Boolean(expert);
 
-  useEffect(() => {
-    if (state.ok) setOpen(false);
-  }, [state.ok]);
+  function handleSubmit(formData: FormData) {
+    startTransition(async () => {
+      const res = await upsertExpertAction({ ok: false }, formData);
+      if (res.ok) {
+        setError(null);
+        setOpen(false);
+        toast.success("Expert berhasil disimpan.");
+      } else {
+        setError(res.error ?? "Gagal menyimpan expert.");
+      }
+    });
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -65,12 +74,12 @@ export function ExpertFormDialog({
           <DialogTitle>{isEdit ? "Edit Expert" : "Tambah Expert"}</DialogTitle>
           <DialogDescription>Pakar yang memberikan penilaian AHP dan WP.</DialogDescription>
         </DialogHeader>
-        <form action={formAction} className="space-y-4">
+        <form action={handleSubmit} className="space-y-4">
           <input type="hidden" name="modelId" value={modelId} />
           {expert ? <input type="hidden" name="id" value={expert.id} /> : null}
-          {state.error ? (
+          {error ? (
             <Alert variant="destructive">
-              <AlertDescription>{state.error}</AlertDescription>
+              <AlertDescription>{error}</AlertDescription>
             </Alert>
           ) : null}
           <div className="space-y-2">

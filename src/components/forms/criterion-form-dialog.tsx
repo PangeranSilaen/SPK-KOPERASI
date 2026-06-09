@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { Plus, Pencil } from "lucide-react";
-import { upsertCriterionAction, type ActionResult } from "@/server/actions/entities";
+import { upsertCriterionAction } from "@/server/actions/entities";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,8 +17,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-const initial: ActionResult = { ok: false };
 
 export type CriterionData = {
   id: string;
@@ -36,12 +35,22 @@ export function CriterionFormDialog({
   criterion?: CriterionData;
 }) {
   const [open, setOpen] = useState(false);
-  const [state, formAction, pending] = useActionState(upsertCriterionAction, initial);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
   const isEdit = Boolean(criterion);
 
-  useEffect(() => {
-    if (state.ok) setOpen(false);
-  }, [state.ok]);
+  function handleSubmit(formData: FormData) {
+    startTransition(async () => {
+      const res = await upsertCriterionAction({ ok: false }, formData);
+      if (res.ok) {
+        setError(null);
+        setOpen(false);
+        toast.success("Kriteria berhasil disimpan.");
+      } else {
+        setError(res.error ?? "Gagal menyimpan kriteria.");
+      }
+    });
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -66,12 +75,12 @@ export function CriterionFormDialog({
             Benefit: makin tinggi makin baik. Cost: makin rendah makin baik.
           </DialogDescription>
         </DialogHeader>
-        <form action={formAction} className="space-y-4">
+        <form action={handleSubmit} className="space-y-4">
           <input type="hidden" name="modelId" value={modelId} />
           {criterion ? <input type="hidden" name="id" value={criterion.id} /> : null}
-          {state.error ? (
+          {error ? (
             <Alert variant="destructive">
-              <AlertDescription>{state.error}</AlertDescription>
+              <AlertDescription>{error}</AlertDescription>
             </Alert>
           ) : null}
           <div className="grid grid-cols-3 gap-3">

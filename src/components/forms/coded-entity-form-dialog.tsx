@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { Plus, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,8 +18,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { ActionResult } from "@/server/actions/entities";
-
-const initial: ActionResult = { ok: false };
 
 export type CodedEntityData = {
   id: string;
@@ -46,12 +45,22 @@ export function CodedEntityFormDialog({
   codePlaceholder: string;
 }) {
   const [open, setOpen] = useState(false);
-  const [state, formAction, pending] = useActionState(action, initial);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
   const isEdit = Boolean(entity);
 
-  useEffect(() => {
-    if (state.ok) setOpen(false);
-  }, [state.ok]);
+  function handleSubmit(formData: FormData) {
+    startTransition(async () => {
+      const res = await action({ ok: false }, formData);
+      if (res.ok) {
+        setError(null);
+        setOpen(false);
+        toast.success(`${entityLabel} berhasil disimpan.`);
+      } else {
+        setError(res.error ?? "Gagal menyimpan data.");
+      }
+    });
+  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -76,12 +85,12 @@ export function CodedEntityFormDialog({
           </DialogTitle>
           <DialogDescription>Kode wajib unik dalam satu Model SPK.</DialogDescription>
         </DialogHeader>
-        <form action={formAction} className="space-y-4">
+        <form action={handleSubmit} className="space-y-4">
           <input type="hidden" name="modelId" value={modelId} />
           {entity ? <input type="hidden" name="id" value={entity.id} /> : null}
-          {state.error ? (
+          {error ? (
             <Alert variant="destructive">
-              <AlertDescription>{state.error}</AlertDescription>
+              <AlertDescription>{error}</AlertDescription>
             </Alert>
           ) : null}
           <div className="grid grid-cols-3 gap-3">
