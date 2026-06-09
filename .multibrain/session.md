@@ -11,4 +11,4 @@ Aturan:
 ## Buckets
 
 - `agents` — catatan workflow agent, setup proyek, dan keputusan tooling. Last updated: 2026-06-09 23:13 WIB -> .multibrain/indexes/agents.md
-- `build` — progres implementasi fitur (scaffold, auth, schema, AHP/WP, import, export). Last updated: 2026-06-09 23:13 WIB -> .multibrain/indexes/build.md
+- `build` — progres implementasi fitur (scaffold, auth, schema, AHP/WP, import, export). MVP + export PDF SELESAI & terverifikasi. Last updated: 2026-06-09 17:55 WIB -> .multibrain/indexes/build.md
