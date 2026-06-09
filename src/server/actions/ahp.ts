@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { saveAhpSchema, preferenceToRatio } from "@/lib/validations/ahp";
 import { assertEditable, ModelError } from "@/server/services/model-service";
+import { logAudit } from "@/server/services/audit-service";
 
 export type SaveAhpResult = { ok: boolean; error?: string };
 
@@ -20,7 +21,7 @@ export async function saveAhpComparisonsAction(input: {
   expertId: string;
   comparisons: ComparisonPayload[];
 }): Promise<SaveAhpResult> {
-  await requireSession();
+  const user = await requireSession();
 
   const parsed = saveAhpSchema.safeParse(input);
   if (!parsed.success) {
@@ -67,6 +68,19 @@ export async function saveAhpComparisonsAction(input: {
       });
     }),
   );
+
+  const expert = await prisma.expert.findUnique({
+    where: { id: expertId },
+    select: { name: true },
+  });
+  await logAudit({
+    modelId,
+    action: "UPSERT",
+    entity: "Penilaian AHP",
+    summary: `Menyimpan penilaian AHP untuk expert "${expert?.name ?? expertId}".`,
+    userId: user.id,
+    userName: user.name,
+  });
 
   revalidatePath(`/model-spk/${modelId}/ahp`);
   revalidatePath(`/model-spk/${modelId}`);

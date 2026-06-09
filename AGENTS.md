@@ -55,7 +55,7 @@ SESSION_SECRET="<random>"
 
 ## Aturan Wajib (jangan dilanggar)
 
-1. Jangan menyimpan data pribadi nasabah (nama, NIK, telepon, alamat).
+1. Nama nasabah BOLEH disimpan pada riwayat kalkulasi (field `customerName` pada `CalculationRun`) untuk menelusuri rekomendasi per nasabah. Ini perubahan kebijakan dari aturan lama. Tetap JANGAN menyimpan data pribadi lain (NIK, telepon, alamat). Nama nasabah adalah PII: akses dibatasi session, tidak ditampilkan publik, dan dokumen export wajib dijaga kerahasiaannya.
 2. Semua perhitungan AHP-WP dilakukan di backend/server logic, bukan dari formula spreadsheet.
 3. Spreadsheet hanya sumber data mentah; import XLSX selalu membuat Model SPK **baru**.
 4. Jangan mengubah Model Aktif secara langsung — duplikat dulu menjadi Draf.

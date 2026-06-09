@@ -55,6 +55,7 @@ model DecisionModel {
   ahpComparisons  AhpComparison[]
   strategyScores  StrategyScore[]
   calculationRuns CalculationRun[]
+  auditLogs       AuditLog[]
 
   @@index([status])
 }
@@ -199,6 +200,11 @@ model CalculationRun {
   model   DecisionModel @relation(fields: [modelId], references: [id], onDelete: Cascade)
 
   conditionId       String?
+  conditionLabel    String?
+  customerName      String?
+  bestAlternative   String?
+  consistencyRatio  Float?
+  isConsistent      Boolean?
   selectedExpertIds Json
 
   ahpResult Json
@@ -210,4 +216,23 @@ model CalculationRun {
   createdAt DateTime @default(now())
 
   @@index([modelId])
+}
+
+model AuditLog {
+  id String @id @default(cuid())
+
+  modelId String?
+  model   DecisionModel? @relation(fields: [modelId], references: [id], onDelete: SetNull)
+
+  userId   String?
+  userName String?
+
+  action  String
+  entity  String
+  summary String
+
+  createdAt DateTime @default(now())
+
+  @@index([modelId])
+  @@index([createdAt])
 }

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { SubPageHeader } from "@/components/model-subpage";
@@ -59,13 +58,6 @@ export default async function AhpPage({
         existing={comparisons as ExistingComparison[]}
         editable={editable}
       />
-
-      <Link
-        href={`/model-spk/${modelId}`}
-        className="text-sm text-muted-foreground hover:text-foreground"
-      >
-        ← Kembali ke detail model
-      </Link>
     </div>
   );
 }

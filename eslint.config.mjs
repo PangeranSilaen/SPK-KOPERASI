@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Skill bundles (bukan kode aplikasi):
+    ".agents/**",
+    ".multibrain/**",
   ]),
 ]);
 

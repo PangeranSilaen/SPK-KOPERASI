@@ -17,6 +17,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export type CriterionData = {
   id: string;
@@ -36,6 +43,7 @@ export function CriterionFormDialog({
 }) {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [type, setType] = useState<"BENEFIT" | "COST">(criterion?.type ?? "BENEFIT");
   const [pending, startTransition] = useTransition();
   const isEdit = Boolean(criterion);
 
@@ -95,15 +103,19 @@ export function CriterionFormDialog({
           </div>
           <div className="space-y-2">
             <Label htmlFor="type">Jenis Kriteria</Label>
-            <select
-              id="type"
-              name="type"
-              defaultValue={criterion?.type ?? "BENEFIT"}
-              className="flex h-9 w-full rounded-lg border border-input bg-transparent px-3 py-1 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            <input type="hidden" name="type" value={type} />
+            <Select
+              value={type}
+              onValueChange={(v) => setType(v as "BENEFIT" | "COST")}
             >
-              <option value="BENEFIT">Benefit</option>
-              <option value="COST">Cost</option>
-            </select>
+              <SelectTrigger id="type" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="BENEFIT">Benefit</SelectItem>
+                <SelectItem value="COST">Cost</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="order">Urutan</Label>

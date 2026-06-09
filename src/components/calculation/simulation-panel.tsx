@@ -8,6 +8,15 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Calculator, Trophy, FileDown } from "lucide-react";
 import {
   calculateRecommendationAction,
@@ -37,6 +46,7 @@ export function SimulationPanel({
   experts: Expert[];
 }) {
   const [conditionId, setConditionId] = useState(conditions[0]?.id ?? "");
+  const [customerName, setCustomerName] = useState("");
   const [selected, setSelected] = useState<Set<string>>(
     () => new Set(experts.filter((e) => e.isEnabled && e.complete).map((e) => e.id)),
   );
@@ -70,6 +80,7 @@ export function SimulationPanel({
         modelId,
         conditionId,
         expertIds,
+        customerName: customerName.trim() || undefined,
       });
       if (res.ok) {
         setResult(res.result);
@@ -87,6 +98,7 @@ export function SimulationPanel({
       conditionId,
       expertIds: [...selected].join(","),
     });
+    if (customerName.trim()) params.set("customerName", customerName.trim());
     window.open(`/api/export/pdf?${params.toString()}`, "_blank");
   }
 
@@ -106,24 +118,36 @@ export function SimulationPanel({
         <CardHeader>
           <CardTitle className="text-base">Parameter Simulasi</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Kondisi Nasabah</label>
-            <select
-              value={conditionId}
-              onChange={(e) => setConditionId(e.target.value)}
-              className="flex h-9 w-full max-w-md rounded-lg border border-input bg-transparent px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
-              {conditions.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.code} - {c.name}
-                </option>
-              ))}
-            </select>
+        <CardContent className="space-y-5">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="sim-condition">Kondisi Nasabah</Label>
+              <Select value={conditionId} onValueChange={(v) => setConditionId(v ?? "")}>
+                <SelectTrigger id="sim-condition" className="w-full">
+                  <SelectValue placeholder="Pilih kondisi" />
+                </SelectTrigger>
+                <SelectContent>
+                  {conditions.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.code} - {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="sim-customer">Nama Nasabah</Label>
+              <Input
+                id="sim-customer"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                placeholder="mis. Budi Santoso"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs text-muted-foreground">Expert yang dilibatkan</label>
+            <Label>Expert yang dilibatkan</Label>
             <div className="grid gap-2 sm:grid-cols-2">
               {experts.map((e) => {
                 const disabled = !e.isEnabled || !e.complete;
@@ -145,11 +169,11 @@ export function SimulationPanel({
                         nonaktif
                       </Badge>
                     ) : !e.complete ? (
-                      <Badge variant="outline" className="text-xs text-muted-foreground">
+                      <Badge variant="outline" className="text-xs text-warning">
                         belum lengkap
                       </Badge>
                     ) : (
-                      <Badge className="bg-[var(--color-trading-up)] text-black text-xs">
+                      <Badge className="border-transparent bg-success-soft text-success text-xs">
                         lengkap
                       </Badge>
                     )}
@@ -186,7 +210,7 @@ export function SimulationPanel({
 
       {result ? (
         <>
-          <Card className="border-primary/40 bg-primary/5">
+          <Card className="border-primary/40 bg-accent">
             <CardContent className="flex flex-wrap items-center justify-between gap-4 py-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
@@ -205,11 +229,11 @@ export function SimulationPanel({
               </div>
               <div className="flex items-center gap-3">
                 {result.ahp.isConsistent ? (
-                  <Badge className="bg-[var(--color-trading-up)] text-black">
+                  <Badge className="border-transparent bg-success-soft text-success">
                     CR {formatDecimal(result.ahp.cr)} (konsisten)
                   </Badge>
                 ) : (
-                  <Badge className="bg-[var(--color-trading-down)] text-white">
+                  <Badge className="border-transparent bg-warning-soft text-warning">
                     CR {formatDecimal(result.ahp.cr)} (tidak konsisten)
                   </Badge>
                 )}

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -120,13 +119,6 @@ export default async function ExpertPage({
           )}
         </CardContent>
       </Card>
-
-      <Link
-        href={`/model-spk/${modelId}`}
-        className="text-sm text-muted-foreground hover:text-foreground"
-      >
-        ← Kembali ke detail model
-      </Link>
     </div>
   );
 }

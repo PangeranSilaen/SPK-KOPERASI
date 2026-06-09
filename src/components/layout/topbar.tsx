@@ -7,10 +7,7 @@ export function Topbar({ user }: { user: SessionUser }) {
   return (
     <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-background px-6">
       <div className="md:hidden flex items-center gap-2">
-        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground text-xs font-bold">
-          SPK
-        </div>
-        <span className="font-semibold text-sm">SPK Koperasi</span>
+        <span className="font-semibold text-sm tracking-tight">SPK Koperasi</span>
       </div>
       <div className="ml-auto flex items-center gap-4">
         <div className="text-right">

@@ -118,9 +118,9 @@ export default async function DashboardPage() {
                     {!e.isEnabled ? " (nonaktif)" : ""}
                   </span>
                   {e.complete ? (
-                    <Badge className="bg-[var(--color-trading-up)] text-black">Lengkap</Badge>
+                    <Badge className="border-transparent bg-success-soft text-success">Lengkap</Badge>
                   ) : (
-                    <Badge variant="outline" className="text-muted-foreground">
+                    <Badge variant="outline" className="text-warning">
                       Belum lengkap
                     </Badge>
                   )}
