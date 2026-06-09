@@ -1,0 +1,213 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ModelStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum CriterionType {
+  BENEFIT
+  COST
+}
+
+enum PairwisePreference {
+  LEFT
+  RIGHT
+  EQUAL
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  createdModels   DecisionModel[]
+  calculationRuns CalculationRun[]
+}
+
+model DecisionModel {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  status      ModelStatus @default(DRAFT)
+  isDefault   Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  createdById String?
+  createdBy   User?   @relation(fields: [createdById], references: [id])
+
+  experts         Expert[]
+  criteria        Criterion[]
+  alternatives    Alternative[]
+  conditions      Condition[]
+  ahpComparisons  AhpComparison[]
+  strategyScores  StrategyScore[]
+  calculationRuns CalculationRun[]
+
+  @@index([status])
+}
+
+model Expert {
+  id      String        @id @default(cuid())
+  modelId String
+  model   DecisionModel @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  name       String
+  position   String?
+  experience String?
+  notes      String?
+  isEnabled  Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  ahpComparisons AhpComparison[]
+  strategyScores StrategyScore[]
+
+  @@unique([modelId, name])
+  @@index([modelId])
+}
+
+model Criterion {
+  id      String        @id @default(cuid())
+  modelId String
+  model   DecisionModel @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  code      String
+  name      String
+  type      CriterionType
+  order     Int           @default(0)
+  isActive  Boolean       @default(true)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  leftComparisons  AhpComparison[] @relation("LeftCriterion")
+  rightComparisons AhpComparison[] @relation("RightCriterion")
+  strategyScores   StrategyScore[]
+
+  @@unique([modelId, code])
+  @@index([modelId])
+}
+
+model Alternative {
+  id      String        @id @default(cuid())
+  modelId String
+  model   DecisionModel @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  code        String
+  name        String
+  description String?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  strategyScores StrategyScore[]
+
+  @@unique([modelId, code])
+  @@index([modelId])
+}
+
+model Condition {
+  id      String        @id @default(cuid())
+  modelId String
+  model   DecisionModel @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  code        String
+  name        String
+  description String?
+  order       Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  strategyScores StrategyScore[]
+
+  @@unique([modelId, code])
+  @@index([modelId])
+}
+
+model AhpComparison {
+  id String @id @default(cuid())
+
+  modelId String
+  model   DecisionModel @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  expertId String
+  expert   Expert @relation(fields: [expertId], references: [id], onDelete: Cascade)
+
+  leftCriterionId String
+  leftCriterion   Criterion @relation("LeftCriterion", fields: [leftCriterionId], references: [id], onDelete: Cascade)
+
+  rightCriterionId String
+  rightCriterion   Criterion @relation("RightCriterion", fields: [rightCriterionId], references: [id], onDelete: Cascade)
+
+  preference PairwisePreference
+  scale      Int
+  ratioValue Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([modelId, expertId, leftCriterionId, rightCriterionId])
+  @@index([modelId, expertId])
+}
+
+model StrategyScore {
+  id String @id @default(cuid())
+
+  modelId String
+  model   DecisionModel @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  expertId String
+  expert   Expert @relation(fields: [expertId], references: [id], onDelete: Cascade)
+
+  conditionId String
+  condition   Condition @relation(fields: [conditionId], references: [id], onDelete: Cascade)
+
+  alternativeId String
+  alternative   Alternative @relation(fields: [alternativeId], references: [id], onDelete: Cascade)
+
+  criterionId String
+  criterion   Criterion @relation(fields: [criterionId], references: [id], onDelete: Cascade)
+
+  value Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([modelId, expertId, conditionId, alternativeId, criterionId])
+  @@index([modelId, expertId])
+  @@index([modelId, conditionId])
+}
+
+model CalculationRun {
+  id String @id @default(cuid())
+
+  modelId String
+  model   DecisionModel @relation(fields: [modelId], references: [id], onDelete: Cascade)
+
+  conditionId       String?
+  selectedExpertIds Json
+
+  ahpResult Json
+  wpResult  Json
+
+  createdById String?
+  createdBy   User?   @relation(fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([modelId])
+}
