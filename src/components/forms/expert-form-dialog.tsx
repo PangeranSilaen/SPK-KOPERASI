@@ -40,6 +40,26 @@ export function ExpertFormDialog({
   const [pending, startTransition] = useTransition();
   const isEdit = Boolean(expert);
 
+  // Field controlled agar tidak memicu warning Base UI saat data di-refresh.
+  const [name, setName] = useState(expert?.name ?? "");
+  const [position, setPosition] = useState(expert?.position ?? "");
+  const [experience, setExperience] = useState(expert?.experience ?? "");
+  const [notes, setNotes] = useState(expert?.notes ?? "");
+  const [isEnabled, setIsEnabled] = useState(expert?.isEnabled ?? true);
+
+  function handleOpenChange(next: boolean) {
+    if (next) {
+      // Reset nilai dari prop saat dialog dibuka.
+      setName(expert?.name ?? "");
+      setPosition(expert?.position ?? "");
+      setExperience(expert?.experience ?? "");
+      setNotes(expert?.notes ?? "");
+      setIsEnabled(expert?.isEnabled ?? true);
+      setError(null);
+    }
+    setOpen(next);
+  }
+
   function handleSubmit(formData: FormData) {
     startTransition(async () => {
       const res = await upsertExpertAction({ ok: false }, formData);
@@ -54,7 +74,7 @@ export function ExpertFormDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger
         render={
           isEdit ? (
@@ -84,11 +104,16 @@ export function ExpertFormDialog({
           ) : null}
           <div className="space-y-2">
             <Label htmlFor="name">Nama Expert</Label>
-            <Input id="name" name="name" defaultValue={expert?.name ?? ""} required />
+            <Input id="name" name="name" value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
           <div className="space-y-2">
             <Label htmlFor="position">Jabatan (opsional)</Label>
-            <Input id="position" name="position" defaultValue={expert?.position ?? ""} />
+            <Input
+              id="position"
+              name="position"
+              value={position}
+              onChange={(e) => setPosition(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="experience">Lama Pengalaman (opsional)</Label>
@@ -96,15 +121,27 @@ export function ExpertFormDialog({
               id="experience"
               name="experience"
               placeholder="contoh: 12 tahun"
-              defaultValue={expert?.experience ?? ""}
+              value={experience}
+              onChange={(e) => setExperience(e.target.value)}
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="notes">Catatan (opsional)</Label>
-            <Textarea id="notes" name="notes" rows={2} defaultValue={expert?.notes ?? ""} />
+            <Textarea
+              id="notes"
+              name="notes"
+              rows={2}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+            />
           </div>
           <div className="flex items-center gap-2">
-            <Checkbox id="isEnabled" name="isEnabled" defaultChecked={expert?.isEnabled ?? true} />
+            <Checkbox
+              id="isEnabled"
+              name="isEnabled"
+              checked={isEnabled}
+              onCheckedChange={(v) => setIsEnabled(v === true)}
+            />
             <Label htmlFor="isEnabled" className="font-normal">
               Aktif digunakan dalam perhitungan
             </Label>

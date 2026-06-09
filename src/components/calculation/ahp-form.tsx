@@ -76,6 +76,21 @@ export function AhpForm({
   const [expertId, setExpertId] = useState<string>(experts[0]?.id ?? "");
   const [pending, startTransition] = useTransition();
 
+  const expertItems = useMemo(
+    () =>
+      Object.fromEntries(
+        experts.map((e) => [e.id, `${e.name}${e.isEnabled ? "" : " (nonaktif)"}`]),
+      ),
+    [experts],
+  );
+  const intensityItems = useMemo(
+    () =>
+      Object.fromEntries(
+        [1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => [String(n), `Intensitas ${n}`]),
+      ),
+    [],
+  );
+
   // State pairwise per expert, di-init dari data existing.
   const initState = useMemo(() => {
     const map = new Map<string, PairState[]>();
@@ -214,7 +229,7 @@ export function AhpForm({
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base">Perbandingan Berpasangan</CardTitle>
             <div className="w-56">
-              <Select value={expertId} onValueChange={(v) => setExpertId(v ?? "")}>
+              <Select items={expertItems} value={expertId} onValueChange={(v) => setExpertId(v ?? "")}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Pilih expert" />
                 </SelectTrigger>
@@ -258,12 +273,12 @@ export function AhpForm({
                         {pair.right.name}
                       </span>
                     </div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <div className="flex gap-1">
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-3 gap-1.5">
                         {(
                           [
                             { v: "LEFT", label: `${pair.left.code} lebih penting` },
-                            { v: "EQUAL", label: "Sama" },
+                            { v: "EQUAL", label: "Sama penting" },
                             { v: "RIGHT", label: `${pair.right.code} lebih penting` },
                           ] as const
                         ).map((opt) => (
@@ -277,7 +292,7 @@ export function AhpForm({
                                 scale: opt.v === "EQUAL" ? 1 : p.scale === 1 ? 3 : p.scale,
                               })
                             }
-                            className={`rounded-md border px-2.5 py-1 text-xs transition-colors ${
+                            className={`rounded-md border px-2 py-1.5 text-center text-xs transition-colors ${
                               p.preference === opt.v
                                 ? "border-primary bg-accent text-accent-foreground"
                                 : "border-border text-muted-foreground hover:bg-muted"
@@ -287,23 +302,27 @@ export function AhpForm({
                           </button>
                         ))}
                       </div>
-                      <div className="ml-auto w-36">
-                        <Select
-                          value={String(p.scale)}
-                          onValueChange={(v) => updatePair(idx, { scale: Number(v) })}
-                          disabled={!editable || p.preference === "EQUAL"}
-                        >
-                          <SelectTrigger size="sm" className="w-full">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
-                              <SelectItem key={n} value={String(n)}>
-                                Intensitas {n}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">Intensitas kepentingan</span>
+                        <div className="ml-auto w-40">
+                          <Select
+                            items={intensityItems}
+                            value={String(p.scale)}
+                            onValueChange={(v) => updatePair(idx, { scale: Number(v) })}
+                            disabled={!editable || p.preference === "EQUAL"}
+                          >
+                            <SelectTrigger size="sm" className="w-full">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
+                                <SelectItem key={n} value={String(n)}>
+                                  Intensitas {n}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
                     </div>
                   </div>
