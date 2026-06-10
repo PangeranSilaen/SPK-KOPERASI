@@ -55,6 +55,22 @@ export function StrategyForm({
   const [conditionId, setConditionId] = useState(conditions[0]?.id ?? "");
   const [pending, startTransition] = useTransition();
 
+  const expertItems = useMemo(
+    () =>
+      Object.fromEntries(
+        experts.map((e) => [e.id, `${e.name}${e.isEnabled ? "" : " (nonaktif)"}`]),
+      ),
+    [experts],
+  );
+  const conditionItems = useMemo(
+    () => Object.fromEntries(conditions.map((c) => [c.id, `${c.code} - ${c.name}`])),
+    [conditions],
+  );
+  const valueItems = useMemo(
+    () => Object.fromEntries([1, 2, 3, 4, 5].map((n) => [String(n), String(n)])),
+    [],
+  );
+
   // Map nilai: key = expertId|conditionId|altId|critId -> value
   const initValues = useMemo(() => {
     const map = new Map<string, number>();
@@ -149,7 +165,7 @@ export function StrategyForm({
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="strat-expert">Expert</Label>
-            <Select value={expertId} onValueChange={(v) => setExpertId(v ?? "")}>
+            <Select items={expertItems} value={expertId} onValueChange={(v) => setExpertId(v ?? "")}>
               <SelectTrigger id="strat-expert" className="w-full">
                 <SelectValue placeholder="Pilih expert" />
               </SelectTrigger>
@@ -165,7 +181,7 @@ export function StrategyForm({
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="strat-condition">Kondisi Nasabah</Label>
-            <Select value={conditionId} onValueChange={(v) => setConditionId(v ?? "")}>
+            <Select items={conditionItems} value={conditionId} onValueChange={(v) => setConditionId(v ?? "")}>
               <SelectTrigger id="strat-condition" className="w-full">
                 <SelectValue placeholder="Pilih kondisi" />
               </SelectTrigger>
@@ -213,13 +229,14 @@ export function StrategyForm({
                     return (
                       <TableCell key={c.id} className="text-center">
                         <Select
+                          items={valueItems}
                           value={v ? String(v) : ""}
                           disabled={!editable}
                           onValueChange={(val) => setValue(a.id, c.id, Number(val))}
                         >
                           <SelectTrigger
                             size="sm"
-                            className={`mx-auto w-16 justify-center ${
+                            className={`mx-auto w-14 justify-center ${
                               v === undefined ? "border-warning/60" : ""
                             }`}
                           >

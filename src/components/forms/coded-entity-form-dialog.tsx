@@ -49,6 +49,24 @@ export function CodedEntityFormDialog({
   const [pending, startTransition] = useTransition();
   const isEdit = Boolean(entity);
 
+  const [code, setCode] = useState(entity?.code ?? "");
+  const [name, setName] = useState(entity?.name ?? "");
+  const [description, setDescription] = useState(entity?.description ?? "");
+  const [order, setOrder] = useState(String(entity?.order ?? 0));
+  const [isActive, setIsActive] = useState(entity?.isActive ?? true);
+
+  function handleOpenChange(next: boolean) {
+    if (next) {
+      setCode(entity?.code ?? "");
+      setName(entity?.name ?? "");
+      setDescription(entity?.description ?? "");
+      setOrder(String(entity?.order ?? 0));
+      setIsActive(entity?.isActive ?? true);
+      setError(null);
+    }
+    setOpen(next);
+  }
+
   function handleSubmit(formData: FormData) {
     startTransition(async () => {
       const res = await action({ ok: false }, formData);
@@ -63,7 +81,7 @@ export function CodedEntityFormDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger
         render={
           isEdit ? (
@@ -100,13 +118,20 @@ export function CodedEntityFormDialog({
                 id="code"
                 name="code"
                 placeholder={codePlaceholder}
-                defaultValue={entity?.code ?? ""}
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
                 required
               />
             </div>
             <div className="col-span-2 space-y-2">
               <Label htmlFor="name">Nama {entityLabel}</Label>
-              <Input id="name" name="name" defaultValue={entity?.name ?? ""} required />
+              <Input
+                id="name"
+                name="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
             </div>
           </div>
           <div className="space-y-2">
@@ -115,7 +140,8 @@ export function CodedEntityFormDialog({
               id="description"
               name="description"
               rows={2}
-              defaultValue={entity?.description ?? ""}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -125,11 +151,17 @@ export function CodedEntityFormDialog({
               name="order"
               type="number"
               min={0}
-              defaultValue={entity?.order ?? 0}
+              value={order}
+              onChange={(e) => setOrder(e.target.value)}
             />
           </div>
           <div className="flex items-center gap-2">
-            <Checkbox id="isActive" name="isActive" defaultChecked={entity?.isActive ?? true} />
+            <Checkbox
+              id="isActive"
+              name="isActive"
+              checked={isActive}
+              onCheckedChange={(v) => setIsActive(v === true)}
+            />
             <Label htmlFor="isActive" className="font-normal">
               {entityLabel} aktif
             </Label>

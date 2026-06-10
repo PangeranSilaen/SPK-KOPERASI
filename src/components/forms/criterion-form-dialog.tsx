@@ -43,9 +43,25 @@ export function CriterionFormDialog({
 }) {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [code, setCode] = useState(criterion?.code ?? "");
+  const [name, setName] = useState(criterion?.name ?? "");
   const [type, setType] = useState<"BENEFIT" | "COST">(criterion?.type ?? "BENEFIT");
+  const [order, setOrder] = useState(String(criterion?.order ?? 0));
+  const [isActive, setIsActive] = useState(criterion?.isActive ?? true);
   const [pending, startTransition] = useTransition();
   const isEdit = Boolean(criterion);
+
+  function handleOpenChange(next: boolean) {
+    if (next) {
+      setCode(criterion?.code ?? "");
+      setName(criterion?.name ?? "");
+      setType(criterion?.type ?? "BENEFIT");
+      setOrder(String(criterion?.order ?? 0));
+      setIsActive(criterion?.isActive ?? true);
+      setError(null);
+    }
+    setOpen(next);
+  }
 
   function handleSubmit(formData: FormData) {
     startTransition(async () => {
@@ -61,7 +77,7 @@ export function CriterionFormDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger
         render={
           isEdit ? (
@@ -94,17 +110,31 @@ export function CriterionFormDialog({
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-2">
               <Label htmlFor="code">Kode</Label>
-              <Input id="code" name="code" placeholder="C1" defaultValue={criterion?.code ?? ""} required />
+              <Input
+                id="code"
+                name="code"
+                placeholder="C1"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                required
+              />
             </div>
             <div className="col-span-2 space-y-2">
               <Label htmlFor="name">Nama Kriteria</Label>
-              <Input id="name" name="name" defaultValue={criterion?.name ?? ""} required />
+              <Input
+                id="name"
+                name="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
             </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="type">Jenis Kriteria</Label>
             <input type="hidden" name="type" value={type} />
             <Select
+              items={{ BENEFIT: "Benefit", COST: "Cost" }}
               value={type}
               onValueChange={(v) => setType(v as "BENEFIT" | "COST")}
             >
@@ -124,11 +154,17 @@ export function CriterionFormDialog({
               name="order"
               type="number"
               min={0}
-              defaultValue={criterion?.order ?? 0}
+              value={order}
+              onChange={(e) => setOrder(e.target.value)}
             />
           </div>
           <div className="flex items-center gap-2">
-            <Checkbox id="isActive" name="isActive" defaultChecked={criterion?.isActive ?? true} />
+            <Checkbox
+              id="isActive"
+              name="isActive"
+              checked={isActive}
+              onCheckedChange={(v) => setIsActive(v === true)}
+            />
             <Label htmlFor="isActive" className="font-normal">
               Kriteria aktif
             </Label>

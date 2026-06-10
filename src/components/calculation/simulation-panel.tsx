@@ -46,6 +46,9 @@ export function SimulationPanel({
   experts: Expert[];
 }) {
   const [conditionId, setConditionId] = useState(conditions[0]?.id ?? "");
+  const conditionItems = Object.fromEntries(
+    conditions.map((c) => [c.id, `${c.code} - ${c.name}`]),
+  );
   const [customerName, setCustomerName] = useState("");
   const [selected, setSelected] = useState<Set<string>>(
     () => new Set(experts.filter((e) => e.isEnabled && e.complete).map((e) => e.id)),
@@ -122,7 +125,7 @@ export function SimulationPanel({
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="sim-condition">Kondisi Nasabah</Label>
-              <Select value={conditionId} onValueChange={(v) => setConditionId(v ?? "")}>
+              <Select items={conditionItems} value={conditionId} onValueChange={(v) => setConditionId(v ?? "")}>
                 <SelectTrigger id="sim-condition" className="w-full">
                   <SelectValue placeholder="Pilih kondisi" />
                 </SelectTrigger>
